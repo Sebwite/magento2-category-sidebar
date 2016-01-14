@@ -14,5 +14,7 @@ This extension will add the ability to show one of your root categories in a sid
 * Upgrade db scheme: `php bin/magento setup:upgrade`
 * Clear cache
 
-You should implement the block `Sebwite\Sidebar\Block\Sidebar` in your theme to make this extension work. Example
+## Configuration
+* Select the root category you want to use from the config page
+* You should implement the block `Sebwite\Sidebar\Block\Sidebar` in your theme to make this extension work. Example
 `<block class="Sebwite\Sidebar\Block\Sidebar" name="category-sidebar" template="Sebwite_Sidebar::sidebar.phtml" />`
