@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="sebwite" sortOrder="200">
+            <label>Sebwite</label>
+        </tab>
+        <section id="sebwite_sidebar" showInDefault="1">
+            <tab>sebwite</tab>
+            <label>Sidebar</label>
+            <resource>Magento_Config::config</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Sidebar settings</label>
+                <field id="category" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Select Sidebar Category</label>
+                    <source_model>Sebwite\Sidebar\Model\Config\Source\Categories</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
