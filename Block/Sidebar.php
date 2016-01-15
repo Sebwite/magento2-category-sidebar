@@ -65,7 +65,7 @@ class Sidebar extends Template {
     /**
      * Get current category
      *
-     * @param $category
+     * @param \Magento\Catalog\Model\Category $category
      * @return Category
      */
     public function isActive($category)
@@ -76,8 +76,14 @@ class Sidebar extends Template {
             return false;
 
         // Check if this is the active category
-        if ($this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource())
-            return (($category->getId() == $activeCategory->getId()) ? true : false);
+        if ($this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() AND
+            $category->getId() == $activeCategory->getId())
+            return true;
+
+        // Check if a subcategory of this category is active
+        $childrenIds = $category->getAllChildren(true);
+        if(in_array($activeCategory->getId(), $childrenIds))
+            return true;
 
         // Fallback - If Flat categories is not enabled the active category does not give an id
         return (($category->getName() == $activeCategory->getName()) ? true : false);
@@ -120,6 +126,38 @@ class Sidebar extends Template {
             return 1;
 
         return $category;
+    }
+
+    /**
+     *
+     */
+    public function getChildCategoryView($category, $html = '')
+    {
+        // Check if category has children
+        if($category->hasChildren()) {
+
+            $childCategories = $this->getSubcategories($category);
+
+            if(count($childCategories) > 0) {
+
+                $html .= '<ul class="o-list o-list--unstyled ' . ($this->isActive($category) ? 'active' : '') .'">';
+
+                // Loop through children categories
+                foreach($childCategories as $childCategory) {
+
+                    $html .= '<li ' . (($this->isActive($childCategory) == true) ? 'class="is-active"' : '') . ' >';
+                    $html .= '<a href="' . $this->getCategoryUrl($childCategory) . '" title="' . $childCategory->getName() . '">' . $childCategory->getName() . '</a>';
+                    $html .= '</li>';
+
+                    if($childCategory->hasChildren()) {
+                        $html .= $this->getChildCategoryView($childCategory);
+                    }
+                }
+                $html .= '</ul>';
+            }
+        }
+
+        return $html;
     }
 
     /**

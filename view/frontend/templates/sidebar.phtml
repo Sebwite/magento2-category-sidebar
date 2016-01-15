@@ -10,24 +10,7 @@ $categories = $block->getCategories();
 foreach($categories as $category) {
 
     // Echo parent category
-    echo '<h4><a href="' . $block->getCategoryUrl($category) . '" title="' . $category->getName() . '">' . $category->getName() . '</a></h4>';
+    echo '<h4><a href="' . $block->getCategoryUrl($category) . '" title="' . $category->getName() . '" class="' . ($block->isActive($category) ? 'is-active' : '') . '">' . $category->getName() . '</a></h4>';
 
-    // Check if category has children
-    if($category->hasChildren()) {
-
-        $childCategories = $block->getSubcategories($category);
-
-        if(count($childCategories) > 0) {
-
-            echo '<ul class="o-list o-list--unstyled">';
-            // Loop through children categories
-            foreach($childCategories as $childCategory) {
-
-                echo '<li ' . (($block->isActive($childCategory) == true) ? 'class="is-active"' : '') . ' >';
-                echo '<a href="' . $block->getCategoryUrl($childCategory) . '" title="' . $childCategory->getName() . '">' . $childCategory->getName() . '</a>';
-                echo '</li>';
-            }
-            echo '</ul>';
-        }
-    }
+    echo $block->getChildCategoryView($category);
 }
