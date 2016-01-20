@@ -63,33 +63,6 @@ class Sidebar extends Template {
     */
 
     /**
-     * Get current category
-     *
-     * @param \Magento\Catalog\Model\Category $category
-     * @return Category
-     */
-    public function isActive($category)
-    {
-        $activeCategory = $this->_coreRegistry->registry('current_category');
-
-        if( ! $activeCategory)
-            return false;
-
-        // Check if this is the active category
-        if ($this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() AND
-            $category->getId() == $activeCategory->getId())
-            return true;
-
-        // Check if a subcategory of this category is active
-        $childrenIds = $category->getAllChildren(true);
-        if(in_array($activeCategory->getId(), $childrenIds))
-            return true;
-
-        // Fallback - If Flat categories is not enabled the active category does not give an id
-        return (($category->getName() == $activeCategory->getName()) ? true : false);
-    }
-
-    /**
      * Get all categories
      *
      * @param bool $sorted
@@ -145,8 +118,17 @@ class Sidebar extends Template {
                 // Loop through children categories
                 foreach($childCategories as $childCategory) {
 
-                    $html .= '<li ' . (($this->isActive($childCategory) == true) ? 'class="is-active"' : '') . ' >';
+                    $html .= '<li>'; // ' . ($this->isActive($childCategory) ? 'class="is-active"' : '') . ' >';
                     $html .= '<a href="' . $this->getCategoryUrl($childCategory) . '" title="' . $childCategory->getName() . '">' . $childCategory->getName() . '</a>';
+
+                    if($childCategory->hasChildren()) {
+                        if($this->isActive($childCategory)) {
+                            $html .= '<span class="expanded"></span>';
+                        } else {
+                            $html .= '<span class="expand"></span>';
+                        }
+                    }
+
                     $html .= '</li>';
 
                     if($childCategory->hasChildren()) {
@@ -173,6 +155,33 @@ class Sidebar extends Template {
             return (array)$category->getChildrenNodes();
 
         return $category->getChildren();
+    }
+
+    /**
+     * Get current category
+     *
+     * @param \Magento\Catalog\Model\Category $category
+     * @return Category
+     */
+    public function isActive($category)
+    {
+        $activeCategory = $this->_coreRegistry->registry('current_category');
+
+        if( ! $activeCategory)
+            return false;
+
+        // Check if this is the active category
+        if ($this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() AND
+            $category->getId() == $activeCategory->getId())
+            return true;
+
+        // Check if a subcategory of this category is active
+        $childrenIds = $category->getAllChildren(true);
+        if(in_array($activeCategory->getId(), $childrenIds))
+            return true;
+
+        // Fallback - If Flat categories is not enabled the active category does not give an id
+        return (($category->getName() == $activeCategory->getName()) ? true : false);
     }
 
     /**

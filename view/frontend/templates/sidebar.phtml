@@ -7,10 +7,18 @@
 $categories = $block->getCategories();
 
 // Loop through categories
-foreach($categories as $category) {
+foreach($categories as $category) :
+?>
+    <div class="root">
+        <h4>
+            <a href="<?php echo $block->getCategoryUrl($category); ?>" title="<?php echo $category->getName(); ?>" class="<?php echo ($block->isActive($category) ? 'is-active' : ''); ?>">
+                <?php echo $category->getName(); ?>
+            </a>
+            <?php if($category->hasChildren()) : ?>
+                <span class="expand"></span>
+            <?php endif; ?>
+        </h4>
 
-    // Echo parent category
-    echo '<h4><a href="' . $block->getCategoryUrl($category) . '" title="' . $category->getName() . '" class="' . ($block->isActive($category) ? 'is-active' : '') . '">' . $category->getName() . '</a></h4>';
-
-    echo $block->getChildCategoryView($category);
-}
+        <?php echo $block->getChildCategoryView($category); ?>
+    </div>
+<?php endforeach; ?>
