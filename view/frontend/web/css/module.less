@@ -1,0 +1,45 @@
+.c-sidebar {
+  width: 18.4%;
+
+  .expand, .expanded {
+    cursor: pointer;
+    float: right;
+  }
+  .o-list {
+    display: none;
+    margin-bottom: 0px;
+    padding-left: 0px;
+
+    li {
+      list-style: none;
+      border-bottom: 1px solid #ededed;
+      padding-bottom: 10px;
+
+      &.active > ul {
+        display: block;
+
+        li:last-of-type {
+          border-bottom: 0px;
+          padding-bottom: 0px;
+          margin-bottom: 0px;
+        }
+      }
+
+      > ul {
+        padding-top: 15px;
+      }
+    }
+    .level0 {
+      list-style: none;
+    }
+    .level1 a {
+      padding-left: 15px;
+    }
+    .level2 a {
+      padding-left: 30px;
+    }
+  }
+  > .o-list {
+    display: block;
+  }
+}

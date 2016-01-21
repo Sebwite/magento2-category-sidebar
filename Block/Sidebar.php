@@ -102,9 +102,12 @@ class Sidebar extends Template {
     }
 
     /**
-     *
+     * @param        $category
+     * @param string $html
+     * @param int    $level
+     * @return string
      */
-    public function getChildCategoryView($category, $html = '')
+    public function getChildCategoryView($category, $html = '', $level = 1)
     {
         // Check if category has children
         if($category->hasChildren()) {
@@ -113,27 +116,27 @@ class Sidebar extends Template {
 
             if(count($childCategories) > 0) {
 
-                $html .= '<ul class="o-list o-list--unstyled ' . ($this->isActive($category) ? 'active' : '') .'">';
+                $html .= '<ul class="o-list o-list--unstyled">';
 
                 // Loop through children categories
                 foreach($childCategories as $childCategory) {
 
-                    $html .= '<li>'; // ' . ($this->isActive($childCategory) ? 'class="is-active"' : '') . ' >';
+                    $html .= '<li class="level' . $level . ($this->isActive($childCategory) ? ' active' : '') .'">';
                     $html .= '<a href="' . $this->getCategoryUrl($childCategory) . '" title="' . $childCategory->getName() . '">' . $childCategory->getName() . '</a>';
 
                     if($childCategory->hasChildren()) {
                         if($this->isActive($childCategory)) {
-                            $html .= '<span class="expanded"></span>';
+                            $html .= '<span class="expanded"><i class="fa fa-minus"></i></span>';
                         } else {
-                            $html .= '<span class="expand"></span>';
+                            $html .= '<span class="expand"><i class="fa fa-plus"></i></span>';
                         }
                     }
 
-                    $html .= '</li>';
-
                     if($childCategory->hasChildren()) {
-                        $html .= $this->getChildCategoryView($childCategory);
+                        $html .= $this->getChildCategoryView($childCategory,'', ($level + 1));
                     }
+
+                    $html .= '</li>';
                 }
                 $html .= '</ul>';
             }
@@ -177,7 +180,7 @@ class Sidebar extends Template {
 
         // Check if a subcategory of this category is active
         $childrenIds = $category->getAllChildren(true);
-        if(in_array($activeCategory->getId(), $childrenIds))
+        if( ! is_null($childrenIds) AND in_array($activeCategory->getId(), $childrenIds))
             return true;
 
         // Fallback - If Flat categories is not enabled the active category does not give an id

@@ -5,20 +5,24 @@
  * @var $block Sebwite\Sidebar\Block\Sidebar
  */
 $categories = $block->getCategories();
-
-// Loop through categories
-foreach($categories as $category) :
 ?>
-    <div class="root">
-        <h4>
-            <a href="<?php echo $block->getCategoryUrl($category); ?>" title="<?php echo $category->getName(); ?>" class="<?php echo ($block->isActive($category) ? 'is-active' : ''); ?>">
+<ul class="o-list">
+
+    <?php
+    // Loop through categories
+    foreach($categories as $category) :
+    ?>
+        <li class="level0<?php echo ($block->isActive($category) ? ' active' : ''); ?>">
+            <a href="<?php echo $block->getCategoryUrl($category); ?>" title="<?php echo $category->getName(); ?>">
                 <?php echo $category->getName(); ?>
             </a>
-            <?php if($category->hasChildren()) : ?>
-                <span class="expand"></span>
-            <?php endif; ?>
-        </h4>
 
-        <?php echo $block->getChildCategoryView($category); ?>
-    </div>
-<?php endforeach; ?>
+            <?php if($category->hasChildren()) : ?>
+                <span class="expand"><?php echo $block->isActive($category) ? '<i class="fa fa-minus"></i>' : '<i class="fa fa-plus"></i>'; ?></span>
+            <?php endif; ?>
+
+            <?php echo $block->getChildCategoryView($category); ?>
+        </li>
+    <?php endforeach; ?>
+
+</ul>
