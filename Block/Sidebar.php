@@ -122,7 +122,7 @@ class Sidebar extends Template {
                 foreach($childCategories as $childCategory) {
 
                     $html .= '<li class="level' . $level . ($this->isActive($childCategory) ? ' active' : '') .'">';
-                    $html .= '<a href="' . $this->getCategoryUrl($childCategory) . '" title="' . $childCategory->getName() . '">' . $childCategory->getName() . '</a>';
+                    $html .= '<a href="' . $this->getCategoryUrl($childCategory) . '" title="' . $childCategory->getName() . '" class="' . ($this->isActive($childCategory) ? 'is-active' : '') . '">' . $childCategory->getName() . '</a>';
 
                     if($childCategory->hasChildren()) {
                         if($this->isActive($childCategory)) {
