@@ -31,9 +31,6 @@ class Sidebar extends Template {
      */
     private $_categoryFactory;
 
-    /** @var \Magento\Catalog\Model\CategoryManage«ment */
-    private $categoryManagement;
-
     /**
      * @param Template\Context                                   $context
      * @param \Magento\Catalog\Helper\Category                   $categoryHelper
@@ -152,7 +149,6 @@ class Sidebar extends Template {
      * Retrieve subcategories
      *
      * @param $category
-     *
      * @return array
      */
     public function getSubcategories($category)
