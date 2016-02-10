@@ -31,6 +31,9 @@ class Sidebar extends Template {
      */
     private $_categoryFactory;
 
+    /** @var \Magento\Catalog\Model\CategoryManage«ment */
+    private $categoryManagement;
+
     /**
      * @param Template\Context                                   $context
      * @param \Magento\Catalog\Helper\Category                   $categoryHelper
@@ -169,9 +172,17 @@ class Sidebar extends Template {
     public function isActive($category)
     {
         $activeCategory = $this->_coreRegistry->registry('current_category');
+        $activeProduct  = $this->_coreRegistry->registry('current_product');
 
-        if( ! $activeCategory)
+        if( ! $activeCategory) {
+
+            // Check if we're on a product page
+            if($activeProduct !== null) {
+                return in_array($category->getId(), $activeProduct->getCategoryIds());
+            }
+
             return false;
+        }
 
         // Check if this is the active category
         if ($this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() AND
@@ -185,6 +196,18 @@ class Sidebar extends Template {
 
         // Fallback - If Flat categories is not enabled the active category does not give an id
         return (($category->getName() == $activeCategory->getName()) ? true : false);
+    }
+
+    /**
+     * Check if the current page is a productpage
+     *
+     * isProduct method
+     * @return bool
+     */
+    public function isProduct()
+    {
+        $activeProduct  = $this->_coreRegistry->registry('current_product');
+        return $activeProduct !== null;
     }
 
     /**
