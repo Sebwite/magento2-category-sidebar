@@ -1,6 +1,7 @@
 <?php namespace Sebwite\Sidebar\Block;
 
 use Magento\Framework\View\Element\Template;
+use Zend\Validator\IsInstanceOf;
 
 /**
  * Class:Sidebar
@@ -245,7 +246,7 @@ class Sidebar extends Template
         $activeProduct  = $this->_coreRegistry->registry('current_product');
         $activeCategory = $this->_coreRegistry->registry('current_category');
 
-        return ($activeCategory !== null && $activeProduct === null);
+        return ($activeCategory !== null && $activeProduct === null && $activeCategory instanceof \Magento\Catalog\Model\Category);
     }
 
     /**
