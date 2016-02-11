@@ -1,4 +1,4 @@
-<?php  namespace Sebwite\Sidebar\Block;
+<?php namespace Sebwite\Sidebar\Block;
 
 use Magento\Framework\View\Element\Template;
 
@@ -10,7 +10,8 @@ use Magento\Framework\View\Element\Template;
  * @package     Sebwite\Sidebar
  * @copyright   Copyright (c) 2015, Sebwite. All rights reserved
  */
-class Sidebar extends Template {
+class Sidebar extends Template
+{
 
     /**
      * @var \Magento\Catalog\Helper\Category
@@ -26,10 +27,14 @@ class Sidebar extends Template {
      * @var \Magento\Catalog\Model\Indexer\Category\Flat\State
      */
     protected $categoryFlatConfig;
+
     /**
      * @var \Magento\Catalog\Model\CategoryFactory
      */
-    private $_categoryFactory;
+    protected $_categoryFactory;
+
+    /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection */
+    protected $_productCollectionFactory;
 
     /**
      * @param Template\Context                                   $context
@@ -47,12 +52,15 @@ class Sidebar extends Template {
         \Magento\Catalog\Model\Indexer\Category\Flat\State $categoryFlatState,
         \Magento\Catalog\Model\CategoryFactory $categoryFactory,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        $data = []
-    ) {
-        $this->_categoryHelper = $categoryHelper;
-        $this->_coreRegistry = $registry;
-        $this->categoryFlatConfig = $categoryFlatState;
-        $this->_categoryFactory = $categoryFactory;
+        \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollectionFactory,
+        $data = [ ]
+    )
+    {
+        $this->_categoryHelper           = $categoryHelper;
+        $this->_coreRegistry             = $registry;
+        $this->categoryFlatConfig        = $categoryFlatState;
+        $this->_categoryFactory          = $categoryFactory;
+        $this->_productCollectionFactory = $productCollectionFactory;
 
         parent::__construct($context, $data);
     }
@@ -74,29 +82,40 @@ class Sidebar extends Template {
     public function getCategories($sorted = false, $asCollection = false, $toLoad = true)
     {
         $cacheKey = sprintf('%d-%d-%d-%d', $this->getSelectedRootCategory(), $sorted, $asCollection, $toLoad);
-        if (isset($this->_storeCategories[$cacheKey])) {
-            return $this->_storeCategories[$cacheKey];
+        if ( isset($this->_storeCategories[ $cacheKey ]) )
+        {
+            return $this->_storeCategories[ $cacheKey ];
         }
 
         /**
          * Check if parent node of the store still exists
          */
         $category = $this->_categoryFactory->create();
+
+        // \Magento\Catalog\Api\CategoryRepositoryInterface $categoryRepository,
+        //  $this->categoryRepository->get($rootCategoryId);
         $storeCategories = $category->getCategories($this->getSelectedRootCategory(), $recursionLevel = 1, $sorted, $asCollection, $toLoad);
 
-        $this->_storeCategories[$cacheKey] = $storeCategories;
+        $this->_storeCategories[ $cacheKey ] = $storeCategories;
 
         return $storeCategories;
     }
 
+    /**
+     * getSelectedRootCategory method
+     *
+     * @return int|mixed
+     */
     public function getSelectedRootCategory()
     {
         $category = $this->_scopeConfig->getValue(
             'sebwite_sidebar/general/category'
         );
 
-        if($category === null)
+        if ( $category === null )
+        {
             return 1;
+        }
 
         return $category;
     }
@@ -105,35 +124,44 @@ class Sidebar extends Template {
      * @param        $category
      * @param string $html
      * @param int    $level
+     *
      * @return string
      */
     public function getChildCategoryView($category, $html = '', $level = 1)
     {
         // Check if category has children
-        if($category->hasChildren()) {
+        if ( $category->hasChildren() )
+        {
 
             $childCategories = $this->getSubcategories($category);
 
-            if(count($childCategories) > 0) {
+            if ( count($childCategories) > 0 )
+            {
 
                 $html .= '<ul class="o-list o-list--unstyled">';
 
                 // Loop through children categories
-                foreach($childCategories as $childCategory) {
+                foreach ( $childCategories as $childCategory )
+                {
 
-                    $html .= '<li class="level' . $level . ($this->isActive($childCategory) ? ' active' : '') .'">';
+                    $html .= '<li class="level' . $level . ($this->isActive($childCategory) ? ' active' : '') . '">';
                     $html .= '<a href="' . $this->getCategoryUrl($childCategory) . '" title="' . $childCategory->getName() . '" class="' . ($this->isActive($childCategory) ? 'is-active' : '') . '">' . $childCategory->getName() . '</a>';
 
-                    if($childCategory->hasChildren()) {
-                        if($this->isActive($childCategory)) {
+                    if ( $childCategory->hasChildren() )
+                    {
+                        if ( $this->isActive($childCategory) )
+                        {
                             $html .= '<span class="expanded"><i class="fa fa-minus"></i></span>';
-                        } else {
+                        }
+                        else
+                        {
                             $html .= '<span class="expand"><i class="fa fa-plus"></i></span>';
                         }
                     }
 
-                    if($childCategory->hasChildren()) {
-                        $html .= $this->getChildCategoryView($childCategory,'', ($level + 1));
+                    if ( $childCategory->hasChildren() )
+                    {
+                        $html .= $this->getChildCategoryView($childCategory, '', ($level + 1));
                     }
 
                     $html .= '</li>';
@@ -149,12 +177,15 @@ class Sidebar extends Template {
      * Retrieve subcategories
      *
      * @param $category
+     *
      * @return array
      */
     public function getSubcategories($category)
     {
-        if ($this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource())
+        if ( $this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() )
+        {
             return (array)$category->getChildrenNodes();
+        }
 
         return $category->getChildren();
     }
@@ -163,6 +194,7 @@ class Sidebar extends Template {
      * Get current category
      *
      * @param \Magento\Catalog\Model\Category $category
+     *
      * @return Category
      */
     public function isActive($category)
@@ -170,10 +202,12 @@ class Sidebar extends Template {
         $activeCategory = $this->_coreRegistry->registry('current_category');
         $activeProduct  = $this->_coreRegistry->registry('current_product');
 
-        if( ! $activeCategory) {
+        if ( !$activeCategory )
+        {
 
             // Check if we're on a product page
-            if($activeProduct !== null) {
+            if ( $activeProduct !== null )
+            {
                 return in_array($category->getId(), $activeProduct->getCategoryIds());
             }
 
@@ -181,14 +215,19 @@ class Sidebar extends Template {
         }
 
         // Check if this is the active category
-        if ($this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() AND
-            $category->getId() == $activeCategory->getId())
+        if ( $this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() AND
+            $category->getId() == $activeCategory->getId()
+        )
+        {
             return true;
+        }
 
         // Check if a subcategory of this category is active
         $childrenIds = $category->getAllChildren(true);
-        if( ! is_null($childrenIds) AND in_array($activeCategory->getId(), $childrenIds))
+        if ( !is_null($childrenIds) AND in_array($activeCategory->getId(), $childrenIds) )
+        {
             return true;
+        }
 
         // Fallback - If Flat categories is not enabled the active category does not give an id
         return (($category->getName() == $activeCategory->getName()) ? true : false);
@@ -198,22 +237,54 @@ class Sidebar extends Template {
      * Check if the current page is a productpage
      *
      * isProduct method
+     *
      * @return bool
      */
-    public function isProduct()
+    public function showPriceSlider()
     {
         $activeProduct  = $this->_coreRegistry->registry('current_product');
-        return $activeProduct !== null;
+        $activeCategory = $this->_coreRegistry->registry('current_category');
+
+        return ($activeCategory !== null && $activeProduct === null);
     }
 
     /**
      * Return Category Id for $category object
      *
      * @param $category
+     *
      * @return string
      */
     public function getCategoryUrl($category)
     {
         return $this->_categoryHelper->getCategoryUrl($category);
+    }
+
+    /**
+     * getMinMax method
+     *
+     * @return array
+     */
+    public function getMinMax()
+    {
+        /* @var $activeCategory \Magento\Catalog\Model\Category */
+        $activeCategory = $this->_coreRegistry->registry('current_category');
+
+        $minCollection = $this->_productCollectionFactory
+            ->addCategoryFilter($activeCategory)
+            ->addAttributeToSort('price')
+            ->setPageSize(1)
+            ->load();
+
+        $maxCollection = $this->_productCollectionFactory
+            ->addCategoryFilter($activeCategory)
+            ->addAttributeToSort('price', 'desc')
+            ->setPageSize(1)
+            ->load();
+
+        $minPrice = $minCollection->getMinPrice();
+        $maxPrice = $maxCollection->getMaxPrice();
+
+        return [ $minPrice, $maxPrice ];
     }
 }
