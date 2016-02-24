@@ -95,8 +95,6 @@ class Sidebar extends Template
          */
         $category = $this->_categoryFactory->create();
 
-        // \Magento\Catalog\Api\CategoryRepositoryInterface $categoryRepository,
-        //  $this->categoryRepository->get($rootCategoryId);
         $storeCategories = $category->getCategories($this->getSelectedRootCategory(), $recursionLevel = 1, $sorted, $asCollection, $toLoad);
 
         $this->_storeCategories[ $cacheKey ] = $storeCategories;
@@ -116,8 +114,6 @@ class Sidebar extends Template
         if ( $activeCategory )
         {
             /* @var $currentProductCollection Collection */
-            $collection = $activeCategory->getProductCollection()->addAttributeToSelect('*');
-
             $currentProductCollection = $this->_productCollectionFactory
                 ->addCategoryFilter($activeCategory)
                 ->addAttributeToSelect('merk')
