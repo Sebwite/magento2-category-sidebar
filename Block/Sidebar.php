@@ -1,7 +1,9 @@
 <?php namespace Sebwite\Sidebar\Block;
 
+use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
+use Magento\Catalog\Model\ResourceModel\Product;
+use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Framework\View\Element\Template;
-use Zend\Validator\IsInstanceOf;
 
 /**
  * Class:Sidebar
@@ -100,6 +102,49 @@ class Sidebar extends Template
         $this->_storeCategories[ $cacheKey ] = $storeCategories;
 
         return $storeCategories;
+    }
+
+    /**
+     * getMerken method
+     */
+    public function getBrands()
+    {
+        $activeCategory = $this->_coreRegistry->registry('current_category');
+
+        $brands = [ ];
+
+        if ( $activeCategory )
+        {
+            /* @var $currentProductCollection Collection */
+            $collection = $activeCategory->getProductCollection()->addAttributeToSelect('*');
+
+            $currentProductCollection = $this->_productCollectionFactory
+                ->addCategoryFilter($activeCategory)
+                ->addAttributeToSelect('merk')
+                ->load();
+
+            // Loop through products and collect brands
+            foreach ( $currentProductCollection as $product )
+            {
+                $product                                 = $product->get();
+                $brands[ urlencode($product[ 'merk' ]) ] = $product[ 'merk' ];
+            }
+
+            // If no brands found (probably not on a category page) show all brands
+            if ( empty($brands) )
+            {
+                $brandCollection = $currentProductCollection->getAllAttributeValues('merk');
+                foreach ( $brandCollection as $brandC )
+                {
+                    foreach ( $brandC as $brand )
+                    {
+                        $brands[ urlencode($product[ 'merk' ]) ] = $brand;
+                    }
+                }
+            }
+        }
+
+        return $brands;
     }
 
     /**
@@ -283,8 +328,8 @@ class Sidebar extends Template
             ->setPageSize(1)
             ->load();
 
-        $minPrice = $minCollection->getMinPrice();
-        $maxPrice = $maxCollection->getMaxPrice();
+        $minPrice = floor($minCollection->getMinPrice() / 5) * 5;;
+        $maxPrice = ceil($maxCollection->getMaxPrice() / 5) * 5;
 
         return [ $minPrice, $maxPrice ];
     }
