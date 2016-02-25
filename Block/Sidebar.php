@@ -122,10 +122,13 @@ class Sidebar extends Template
             // Loop through products and collect brands
             foreach ( $currentProductCollection as $product )
             {
-                $product                                 = $product->get();
-                $brands[ urlencode($product[ 'merk' ]) ] = $product[ 'merk' ];
-            }
+                $product = $product->get();
 
+                if ( isset($product[ 'merk' ]) )
+                {
+                    $brands[ urlencode($product[ 'merk' ]) ] = $product[ 'merk' ];
+                }
+            }
             // If no brands found (probably not on a category page) show all brands
             if ( empty($brands) )
             {
@@ -134,6 +137,11 @@ class Sidebar extends Template
                 {
                     foreach ( $brandC as $brand )
                     {
+                        if ( !isset($product[ 'merk' ]) )
+                        {
+                            continue;
+                        }
+
                         $brands[ urlencode($product[ 'merk' ]) ] = $brand;
                     }
                 }
