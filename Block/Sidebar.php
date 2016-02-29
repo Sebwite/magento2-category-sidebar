@@ -39,14 +39,23 @@ class Sidebar extends Template
     /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection */
     protected $_productCollectionFactory;
 
+    /** @var \Magento\Framework\App\ObjectManager */
+    private $objectManager;
+
+    /** @var \Magento\Catalog\Helper\Output */
+    private $helper;
+
     /**
-     * @param Template\Context                                   $context
-     * @param \Magento\Catalog\Helper\Category                   $categoryHelper
-     * @param \Magento\Framework\Registry                        $registry
-     * @param \Magento\Catalog\Model\Indexer\Category\Flat\State $categoryFlatState
-     * @param \Magento\Catalog\Model\CategoryFactory             $categoryFactory
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param array                                              $data
+     * @param Template\Context                                        $context
+     * @param \Magento\Catalog\Helper\Category                        $categoryHelper
+     * @param \Magento\Framework\Registry                             $registry
+     * @param \Magento\Catalog\Model\Indexer\Category\Flat\State      $categoryFlatState
+     * @param \Magento\Catalog\Model\CategoryFactory                  $categoryFactory
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface      $scopeConfig
+     * @param \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollectionFactory
+     * @param \Magento\Framework\App\ObjectManager                    $objectManager
+     *
+     * @internal param array $data
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
@@ -56,6 +65,8 @@ class Sidebar extends Template
         \Magento\Catalog\Model\CategoryFactory $categoryFactory,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollectionFactory,
+        \Magento\Catalog\Helper\Output $helper,
+//        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
         $data = [ ]
     )
     {
@@ -64,6 +75,7 @@ class Sidebar extends Template
         $this->categoryFlatConfig        = $categoryFlatState;
         $this->_categoryFactory          = $categoryFactory;
         $this->_productCollectionFactory = $productCollectionFactory;
+        $this->helper = $helper;
 
         parent::__construct($context, $data);
     }
@@ -113,38 +125,18 @@ class Sidebar extends Template
 
         if ( $activeCategory )
         {
-            /* @var $currentProductCollection Collection */
-            $currentProductCollection = $this->_productCollectionFactory
-                ->addCategoryFilter($activeCategory)
+            // build and filter the product collection
+            $products = $this->_productCollectionFactory
                 ->addAttributeToSelect('merk')
+                ->addCategoryFilter($activeCategory)
                 ->load();
 
-            // Loop through products and collect brands
-            foreach ( $currentProductCollection as $product )
-            {
-                $product = $product->get();
+            $brands = array_unique($products->getColumnValues('merk'));
 
-                if ( isset($product[ 'merk' ]) )
-                {
-                    $brands[ urlencode($product[ 'merk' ]) ] = $product[ 'merk' ];
-                }
-            }
             // If no brands found (probably not on a category page) show all brands
             if ( empty($brands) )
             {
-                $brandCollection = $currentProductCollection->getAllAttributeValues('merk');
-                foreach ( $brandCollection as $brandC )
-                {
-                    foreach ( $brandC as $brand )
-                    {
-                        if ( !isset($product[ 'merk' ]) )
-                        {
-                            continue;
-                        }
-
-                        $brands[ urlencode($product[ 'merk' ]) ] = $brand;
-                    }
-                }
+                $brands = $activeCategory->getProductCollection()->getColumnValues('merk');
             }
         }
 
