@@ -21,25 +21,8 @@ class SidebarFilter
     {
         if ( $fields === 'category_ids' )
         {
-
-            // Get Price
-            $price = isset($_GET[ 'price' ]) ? $_GET[ 'price' ] : false;
-
             // Get brand
             $brands = isset($_GET[ 'brands' ]) ? $_GET[ 'brands' ] : false;
-
-            if ( $price )
-            {
-
-                $price = explode('-', $price);
-
-                // Check if price is set and is numeric
-                if ( isset($price[ 0 ]) && is_numeric($price[ 0 ]) && isset($price[ 1 ]) && is_numeric($price[ 1 ]) )
-                {
-                    $collection->addAttributeToFilter('price', [ 'gteq' => $price[ 0 ] ]);
-                    $collection->addAttributeToFilter('price', [ 'lteq' => $price[ 1 ] ]);
-                }
-            }
 
             if ( $brands )
             {

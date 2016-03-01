@@ -327,6 +327,9 @@ class Sidebar extends Template
         $minPrice = floor($minCollection->getMinPrice() / 5) * 5;;
         $maxPrice = ceil($maxCollection->getMaxPrice() / 5) * 5;
 
+        if($minPrice == 0 && $maxPrice == 0)
+            return false;
+
         return [ $minPrice, $maxPrice ];
     }
 }
