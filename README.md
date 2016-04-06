@@ -1,5 +1,6 @@
 # Magento 2.0 Category Sidebar extension
 ![Alt text](header.jpg?raw=true "Magento2 Category sidebar")
+
 This extension will add the ability to show one of your root categories in a sidebar. The root category can be selected from the Magento2 admin config page.
 
 ## Installation with composer
