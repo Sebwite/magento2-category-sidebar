@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_layout.xsd">
+    <update handle="2columns-left"/>
+
+    <referenceContainer name="columns">
+        <container name="div.sidebar.main" htmlTag="div" htmlClass="c-sidebar c-sidebar--categories">
+            <block class="Sebwite\Sidebar\Block\Sidebar" name="category-sidebar" template="Sebwite_Sidebar::sidebar.phtml"/>
+        </container>
+    </referenceContainer>
+</layout>

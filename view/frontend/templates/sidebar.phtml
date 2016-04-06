@@ -5,29 +5,25 @@
  * @var $block Sebwite\Sidebar\Block\Sidebar
  */
 $categories = $block->getCategories();
+$brands     = $block->getBrands();
+?>
 
-// Loop through categories
-foreach($categories as $category) {
+<h3><?php echo __('Categories'); ?></h3>
+<ul class="o-list">
 
-    // Echo parent category
-    echo '<h4><a href="' . $block->getCategoryUrl($category) . '" title="' . $category->getName() . '">' . $category->getName() . '</a></h4>';
+    <?php
+    // Loop through categories
+    foreach ( $categories as $category ) :
+        ?>
+        <li class="level0<?php echo($block->isActive($category) ? ' active' : ''); ?>">
+            <a href="<?php echo $block->getCategoryUrl($category); ?>" title="<?php echo $category->getName(); ?>" class="<?php echo($block->isActive($category) ? ' active' : ''); ?>">
+                <?php echo $category->getName(); ?>
+            </a>
+            <?php if ( $category->hasChildren() ) : ?>
+                <span class="expand"><?php echo $block->isActive($category) ? '<i class="fa fa-minus"></i>' : '<i class="fa fa-plus"></i>'; ?></span>
+            <?php endif; ?>
 
-    // Check if category has children
-    if($category->hasChildren()) {
-
-        $childCategories = $block->getSubcategories($category);
-
-        if(count($childCategories) > 0) {
-
-            echo '<ul class="o-list o-list--unstyled">';
-            // Loop through children categories
-            foreach($childCategories as $childCategory) {
-
-                echo '<li ' . (($block->isActive($childCategory) == true) ? 'class="is-active"' : '') . ' >';
-                echo '<a href="' . $block->getCategoryUrl($childCategory) . '" title="' . $childCategory->getName() . '">' . $childCategory->getName() . '</a>';
-                echo '</li>';
-            }
-            echo '</ul>';
-        }
-    }
-}
+            <?php echo $block->getChildCategoryView($category); ?>
+        </li>
+    <?php endforeach; ?>
+</ul>
