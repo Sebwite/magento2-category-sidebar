@@ -59,6 +59,7 @@ class Sidebar extends Template
         \Magento\Framework\Registry $registry,
         \Magento\Catalog\Model\Indexer\Category\Flat\State $categoryFlatState,
         \Magento\Catalog\Model\CategoryFactory $categoryFactory,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollectionFactory,
         \Magento\Catalog\Helper\Output $helper,
         $data = [ ]
@@ -140,7 +141,7 @@ class Sidebar extends Template
         if ( $category->hasChildren() )
         {
 
-            $childCategories = $this->getSubcategories($category);
+            $childCategories = $category->getChildrenCategories();
 
             if ( count($childCategories) > 0 )
             {
@@ -182,11 +183,13 @@ class Sidebar extends Template
 
     /**
      * Retrieve subcategories
+     * DEPRECATED
      *
      * @param $category
      *
      * @return array
      */
+    /*
     public function getSubcategories($category)
     {
         if ( $this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() )
@@ -196,6 +199,7 @@ class Sidebar extends Template
 
         return $category->getChildren();
     }
+    */
 
     /**
      * Get current category
