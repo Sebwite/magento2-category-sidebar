@@ -50,8 +50,6 @@ class Sidebar extends Template
      * @param \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollectionFactory
      * @param \Magento\Catalog\Helper\Output                          $helper
      * @param array                                                   $data
-     *
-     * @internal param array $data
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
