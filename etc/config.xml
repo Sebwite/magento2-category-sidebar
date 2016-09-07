@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Store/etc/config.xsd">
+	<default>
+		<sidebar>
+			<general>
+				<enabled>1</enabled>
+				<categorydepth>1</categorydepth>
+			</general>
+		</sidebar>
+	</default>
+</config>

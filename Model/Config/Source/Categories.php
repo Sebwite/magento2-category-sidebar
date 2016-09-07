@@ -55,6 +55,8 @@ class Categories implements \Magento\Framework\Option\ArrayInterface {
         foreach($storeCategories as $category) {
             $resultArray[$category->getId()] = $category->getName();
         }
+		
+		$resultArray['current_category_children'] = __('Current Category Children');
 
         return $resultArray;
     }
