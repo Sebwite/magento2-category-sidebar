@@ -1,7 +1,6 @@
-.c-sidebar {
-    width: 18.4%;
-
-    .expand, .expanded {
+.sidebar {
+    .expand,
+    .expanded {
         cursor: pointer;
         float: right;
     }
@@ -9,16 +8,13 @@
         display: none;
         margin-bottom: 0px;
         padding-left: 0px;
-
         li {
             list-style: none;
             border-bottom: 1px solid #ededed;
             padding-bottom: 10px;
-
             &.active {
                 > ul {
                     display: block;
-
                     li:last-of-type {
                         border-bottom: 0px;
                         padding-bottom: 0px;
@@ -26,14 +22,12 @@
                     }
                 }
             }
-
             a {
                 &.active {
                     font-weight: bold;
                 }
                 display: inline-block;
             }
-
             > ul {
                 padding-top: 7px;
                 margin-top: 0px;
