@@ -37,9 +37,6 @@ class Sidebar extends Template
 
     /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection */
     protected $_productCollectionFactory;
-
-	/** @var \Magento\Framework\Registry */
-    protected $registry;
 	
     /** @var \Magento\Catalog\Helper\Output */
     private $helper;
@@ -66,7 +63,6 @@ class Sidebar extends Template
         \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollectionFactory,
         \Magento\Catalog\Helper\Output $helper,
 		\Sebwite\Sidebar\Helper\Data $dataHelper,
-		\Magento\Framework\Registry $registry,
         $data = [ ]
     )
     {
@@ -77,7 +73,6 @@ class Sidebar extends Template
         $this->_productCollectionFactory = $productCollectionFactory;
         $this->helper                    = $helper;
 		$this->_dataHelper = $dataHelper;
-		$this->registry = $registry;
 
         parent::__construct($context, $data);
     }
@@ -130,8 +125,24 @@ class Sidebar extends Template
         );
 
 		if ( $category == 'current_category_children'){
-			return $this->registry->registry('current_category')->getId();
+			$currentCategory = $this->_coreRegistry->registry('current_category');
+			if($currentCategory){
+				return $currentCategory->getId();
+			}
+			return 1;
 		}
+		
+		if ( $category == 'current_category_parent_children'){
+			$currentCategory = $this->_coreRegistry->registry('current_category');
+			if($currentCategory){
+				$topLevelParent = $currentCategory->getPath();
+				$topLevelParentArray = explode("/", $topLevelParent);
+				if(isset($topLevelParent)){
+					return $topLevelParentArray[2];
+				}
+			}
+			return 1;
+		}		
 		
         if ( $category === null )
         {
@@ -196,6 +207,7 @@ class Sidebar extends Template
 
     /**
      * Retrieve subcategories
+     * DEPRECATED
 	 *
      * @param $category
      *
