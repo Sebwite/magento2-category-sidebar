@@ -57,6 +57,7 @@ class Categories implements \Magento\Framework\Option\ArrayInterface {
         }
 		
 		$resultArray['current_category_children'] = __('Current Category Children');
+		$resultArray['current_category_parent_children'] = __('Current Category Parent Children');
 
         return $resultArray;
     }
