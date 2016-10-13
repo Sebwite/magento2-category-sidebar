@@ -194,7 +194,7 @@ class Sidebar extends Template
             return (array)$category->getChildrenNodes();
         }
 
-        return $category->getChildren();
+        return $category->getChildrenCategories();
     }
 
     /**
