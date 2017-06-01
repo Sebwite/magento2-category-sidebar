@@ -138,7 +138,7 @@ class Sidebar extends Template
         if ( $category->hasChildren() )
         {
 
-            $childCategories = $this->getSubcategories($category);
+            $childCategories = $category->getChildrenCategories();
 
             if ( count($childCategories) > 0 )
             {
@@ -180,11 +180,13 @@ class Sidebar extends Template
 
     /**
      * Retrieve subcategories
+     * DEPRECATED
      *
      * @param $category
      *
      * @return array
      */
+    /*
     public function getSubcategories($category)
     {
         if ( $this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() )
@@ -194,6 +196,7 @@ class Sidebar extends Template
 
         return $category->getChildrenCategories();
     }
+    */
 
     /**
      * Get current category
