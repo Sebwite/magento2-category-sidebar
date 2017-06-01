@@ -12,11 +12,21 @@
             <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0"
                    showInStore="0">
                 <label>Sidebar settings</label>
-                <field id="category" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0"
+                <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Is Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>				
+                <field id="category" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="0"
                        showInStore="0">
                     <label>Select Sidebar Category</label>
                     <source_model>Sebwite\Sidebar\Model\Config\Source\Categories</source_model>
                 </field>
+                <field id="categorydepth" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Select Category Depth</label>
+                    <source_model>Sebwite\Sidebar\Model\Config\Source\Depth</source_model>
+                </field>				
             </group>
         </section>
     </system>

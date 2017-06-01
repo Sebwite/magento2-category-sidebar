@@ -37,10 +37,10 @@ class Sidebar extends Template
 
     /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection */
     protected $_productCollectionFactory;
-
+	
     /** @var \Magento\Catalog\Helper\Output */
     private $helper;
-
+	
     /**
      * @param Template\Context                                        $context
      * @param \Magento\Catalog\Helper\Category                        $categoryHelper
@@ -57,8 +57,10 @@ class Sidebar extends Template
         \Magento\Framework\Registry $registry,
         \Magento\Catalog\Model\Indexer\Category\Flat\State $categoryFlatState,
         \Magento\Catalog\Model\CategoryFactory $categoryFactory,
+		\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollectionFactory,
         \Magento\Catalog\Helper\Output $helper,
+		\Sebwite\Sidebar\Helper\Data $dataHelper,
         $data = [ ]
     )
     {
@@ -68,15 +70,16 @@ class Sidebar extends Template
         $this->_categoryFactory          = $categoryFactory;
         $this->_productCollectionFactory = $productCollectionFactory;
         $this->helper                    = $helper;
+		$this->_dataHelper = $dataHelper;
 
         parent::__construct($context, $data);
     }
-
+	
     /*
     * Get owner name
     * @return string
     */
-
+	
     /**
      * Get all categories
      *
@@ -98,8 +101,10 @@ class Sidebar extends Template
          * Check if parent node of the store still exists
          */
         $category = $this->_categoryFactory->create();
+		
+		$categoryDepthLevel = $this->_dataHelper->getCategoryDepthLevel();
 
-        $storeCategories = $category->getCategories($this->getSelectedRootCategory(), $recursionLevel = 1, $sorted, $asCollection, $toLoad);
+        $storeCategories = $category->getCategories($this->getSelectedRootCategory(), $recursionLevel = $categoryDepthLevel, $sorted, $asCollection, $toLoad);
 
         $this->_storeCategories[ $cacheKey ] = $storeCategories;
 
@@ -117,6 +122,26 @@ class Sidebar extends Template
             'sebwite_sidebar/general/category'
         );
 
+		if ( $category == 'current_category_children'){
+			$currentCategory = $this->_coreRegistry->registry('current_category');
+			if($currentCategory){
+				return $currentCategory->getId();
+			}
+			return 1;
+		}
+		
+		if ( $category == 'current_category_parent_children'){
+			$currentCategory = $this->_coreRegistry->registry('current_category');
+			if($currentCategory){
+				$topLevelParent = $currentCategory->getPath();
+				$topLevelParentArray = explode("/", $topLevelParent);
+				if(isset($topLevelParent)){
+					return $topLevelParentArray[2];
+				}
+			}
+			return 1;
+		}		
+		
         if ( $category === null )
         {
             return 1;
@@ -133,7 +158,7 @@ class Sidebar extends Template
      * @return string
      */
     public function getChildCategoryView($category, $html = '', $level = 1)
-    {
+    {	
         // Check if category has children
         if ( $category->hasChildren() )
         {
@@ -180,11 +205,13 @@ class Sidebar extends Template
 
     /**
      * Retrieve subcategories
-     *
+     * DEPRECATED
+	 *
      * @param $category
      *
      * @return array
      */
+	 
     public function getSubcategories($category)
     {
         if ( $this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() )
@@ -194,6 +221,7 @@ class Sidebar extends Template
 
         return $category->getChildrenCategories();
     }
+	
 
     /**
      * Get current category

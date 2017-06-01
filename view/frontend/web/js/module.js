@@ -3,8 +3,7 @@
  ========================================================================== */
 require(['jquery'], function ($) {
     $(function () {
-
-        $('.c-sidebar').on('click','.o-list .expand, .o-list .expanded', function () {
+        $('.sidebar').on('click', '.o-list .expand, .o-list .expanded', function () {
             var element = $(this).parent('li');
 
             if (element.hasClass('active')) {
@@ -14,9 +13,7 @@ require(['jquery'], function ($) {
                 element.find('li').removeClass('active');
 
                 element.find('i').removeClass('fa-minus').addClass('fa-plus');
-            }
-
-            else {
+            } else {
                 element.children('ul').slideDown();
                 element.siblings('li').children('ul').slideUp();
                 element.parent('ul').find('i').removeClass('fa-minus').addClass('fa-plus');
