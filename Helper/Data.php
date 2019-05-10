@@ -41,7 +41,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getConfigPath(
         $xmlPath,
-        $section = 'sebwitete_sidebar'
+        $section = 'sebwite_sidebar'
     ) {
         return $section . '/' . $xmlPath;
     }
