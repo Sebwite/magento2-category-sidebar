@@ -241,8 +241,8 @@ class Sidebar extends Template
         }
 
         // Check if this is the active category
-        if ($this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() and
-            $category->getId() == $activeCategory->getId()
+        if ($this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource()
+            && $category->getId() == $activeCategory->getId()
         ) {
             return true;
         }
