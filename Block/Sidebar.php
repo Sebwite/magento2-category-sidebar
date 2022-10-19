@@ -44,6 +44,9 @@ class Sidebar extends Template
      */
     protected $_dataHelper;
 
+    /**
+     * @var array
+     */
     protected $_storeCategories;
 
     /**
@@ -102,8 +105,8 @@ class Sidebar extends Template
 
         $categoryDepthLevel = $this->_dataHelper->getCategoryDepthLevel();
 
-        $storeCategories = $category->getCategories($this->getSelectedRootCategory(),
-            $recursionLevel = $categoryDepthLevel, $sorted, $asCollection, $toLoad);
+        $storeCategories = $category->getCategories($this->getSelectedRootCategory(), (string) $categoryDepthLevel, $sorted,
+            $asCollection, $toLoad);
 
         $this->_storeCategories[$cacheKey] = $storeCategories;
 
@@ -203,7 +206,7 @@ class Sidebar extends Template
      *
      * @param $category
      *
-     * @return array
+     * @return Category[] | \Magento\Catalog\Model\ResourceModel\Category\Collection
      */
 
     public function getSubcategories(Category $category)
@@ -245,7 +248,7 @@ class Sidebar extends Template
 
         // Check if a subcategory of this category is active
         $childrenIds = $category->getAllChildren(true);
-        if (!is_null($childrenIds) and in_array($activeCategory->getId(), $childrenIds)) {
+        if (!empty($childrenIds) && is_array($childrenIds) && in_array($activeCategory->getId(), $childrenIds)) {
             return true;
         }
 
@@ -260,7 +263,7 @@ class Sidebar extends Template
      *
      * @return string
      */
-    public function getCategoryUrl($category)
+    public function getCategoryUrl(Category $category)
     {
         return $this->_categoryHelper->getCategoryUrl($category);
     }
