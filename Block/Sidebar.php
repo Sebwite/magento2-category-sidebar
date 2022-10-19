@@ -206,7 +206,6 @@ class Sidebar extends Template
      *
      * @param $category
      *
-     * @return \Magento\Catalog\Model\ResourceModel\Category\Collection|\Magento\Catalog\Model\Category[]
      */
 
     public function getSubcategories(Category $category)
