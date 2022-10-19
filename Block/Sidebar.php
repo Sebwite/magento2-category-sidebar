@@ -1,6 +1,7 @@
 <?php namespace Sebwite\Sidebar\Block;
 
 use Magento\Catalog\Model\Category;
+use Magento\Catalog\Model\ResourceModel\Category\Collection;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
 use Magento\Catalog\Model\ResourceModel\Product;
 use Magento\Framework\View\Element\Template;
@@ -89,7 +90,7 @@ class Sidebar extends Template
      * @param bool $asCollection
      * @param bool $toLoad
      *
-     * @return array|\Magento\Catalog\Model\ResourceModel\Category\Collection|\Magento\Framework\Data\Tree\Node\Collection
+     * @return array|Collection|\Magento\Framework\Data\Tree\Node\Collection
      */
     public function getCategories($sorted = false, $asCollection = false, $toLoad = true)
     {
@@ -105,7 +106,7 @@ class Sidebar extends Template
 
         $categoryDepthLevel = $this->_dataHelper->getCategoryDepthLevel();
 
-        $storeCategories = $category->getCategories($this->getSelectedRootCategory(), (int) $categoryDepthLevel, $sorted,
+        $storeCategories = $category->getCategories($this->getSelectedRootCategory(), (int)$categoryDepthLevel, $sorted,
             $asCollection, $toLoad);
 
         $this->_storeCategories[$cacheKey] = $storeCategories;
@@ -206,6 +207,7 @@ class Sidebar extends Template
      *
      * @param $category
      *
+     * @return array|Collection|Category[]
      */
 
     public function getSubcategories(Category $category)
