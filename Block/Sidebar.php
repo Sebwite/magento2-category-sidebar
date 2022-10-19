@@ -1,5 +1,6 @@
 <?php namespace Sebwite\Sidebar\Block;
 
+use Magento\Catalog\Model\Category;
 use Magento\Catalog\Model\ResourceModel\Eav\Attribute;
 use Magento\Catalog\Model\ResourceModel\Product;
 use Magento\Framework\View\Element\Template;
@@ -37,10 +38,14 @@ class Sidebar extends Template
 
     /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection */
     protected $_productCollectionFactory;
-	
-    /** @var \Magento\Catalog\Helper\Output */
-    private $helper;
-	
+
+    /**
+     * @var \Sebwite\Sidebar\Helper\Data
+     */
+    protected $_dataHelper;
+
+    protected $_storeCategories;
+
     /**
      * @param Template\Context                                        $context
      * @param \Magento\Catalog\Helper\Category                        $categoryHelper
@@ -48,7 +53,6 @@ class Sidebar extends Template
      * @param \Magento\Catalog\Model\Indexer\Category\Flat\State      $categoryFlatState
      * @param \Magento\Catalog\Model\CategoryFactory                  $categoryFactory
      * @param \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollectionFactory
-     * @param \Magento\Catalog\Helper\Output                          $helper
      * @param array                                                   $data
      */
     public function __construct(
@@ -57,29 +61,24 @@ class Sidebar extends Template
         \Magento\Framework\Registry $registry,
         \Magento\Catalog\Model\Indexer\Category\Flat\State $categoryFlatState,
         \Magento\Catalog\Model\CategoryFactory $categoryFactory,
-		\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollectionFactory,
-        \Magento\Catalog\Helper\Output $helper,
-		\Sebwite\Sidebar\Helper\Data $dataHelper,
-        $data = [ ]
-    )
-    {
+        \Sebwite\Sidebar\Helper\Data $dataHelper,
+        $data = []
+    ) {
         $this->_categoryHelper           = $categoryHelper;
         $this->_coreRegistry             = $registry;
         $this->categoryFlatConfig        = $categoryFlatState;
         $this->_categoryFactory          = $categoryFactory;
         $this->_productCollectionFactory = $productCollectionFactory;
-        $this->helper                    = $helper;
-		$this->_dataHelper = $dataHelper;
-
+        $this->_dataHelper               = $dataHelper;
         parent::__construct($context, $data);
     }
-	
+
     /*
     * Get owner name
     * @return string
     */
-	
+
     /**
      * Get all categories
      *
@@ -92,21 +91,21 @@ class Sidebar extends Template
     public function getCategories($sorted = false, $asCollection = false, $toLoad = true)
     {
         $cacheKey = sprintf('%d-%d-%d-%d', $this->getSelectedRootCategory(), $sorted, $asCollection, $toLoad);
-        if ( isset($this->_storeCategories[ $cacheKey ]) )
-        {
-            return $this->_storeCategories[ $cacheKey ];
+        if (isset($this->_storeCategories[$cacheKey])) {
+            return $this->_storeCategories[$cacheKey];
         }
 
         /**
          * Check if parent node of the store still exists
          */
         $category = $this->_categoryFactory->create();
-		
-		$categoryDepthLevel = $this->_dataHelper->getCategoryDepthLevel();
 
-        $storeCategories = $category->getCategories($this->getSelectedRootCategory(), $recursionLevel = $categoryDepthLevel, $sorted, $asCollection, $toLoad);
+        $categoryDepthLevel = $this->_dataHelper->getCategoryDepthLevel();
 
-        $this->_storeCategories[ $cacheKey ] = $storeCategories;
+        $storeCategories = $category->getCategories($this->getSelectedRootCategory(),
+            $recursionLevel = $categoryDepthLevel, $sorted, $asCollection, $toLoad);
+
+        $this->_storeCategories[$cacheKey] = $storeCategories;
 
         return $storeCategories;
     }
@@ -122,28 +121,29 @@ class Sidebar extends Template
             'sebwite_sidebar/general/category'
         );
 
-		if ( $category == 'current_category_children'){
-			$currentCategory = $this->_coreRegistry->registry('current_category');
-			if($currentCategory){
-				return $currentCategory->getId();
-			}
-			return 1;
-		}
-		
-		if ( $category == 'current_category_parent_children'){
-			$currentCategory = $this->_coreRegistry->registry('current_category');
-			if($currentCategory){
-				$topLevelParent = $currentCategory->getPath();
-				$topLevelParentArray = explode("/", $topLevelParent);
-				if(isset($topLevelParent)){
-					return $topLevelParentArray[2];
-				}
-			}
-			return 1;
-		}		
-		
-        if ( $category === null )
-        {
+        if ($category == 'current_category_children') {
+            $currentCategory = $this->_coreRegistry->registry('current_category');
+            if ($currentCategory) {
+                return $currentCategory->getId();
+            }
+
+            return 1;
+        }
+
+        if ($category == 'current_category_parent_children') {
+            $currentCategory = $this->_coreRegistry->registry('current_category');
+            if ($currentCategory) {
+                $topLevelParent      = $currentCategory->getPath();
+                $topLevelParentArray = explode("/", $topLevelParent);
+                if (isset($topLevelParent)) {
+                    return $topLevelParentArray[2];
+                }
+            }
+
+            return 1;
+        }
+
+        if ($category === null) {
             return 1;
         }
 
@@ -157,40 +157,34 @@ class Sidebar extends Template
      *
      * @return string
      */
-    public function getChildCategoryView($category, $html = '', $level = 1)
-    {	
+    public function getChildCategoryView(Category $category, $html = '', $level = 1)
+    {
         // Check if category has children
-        if ( $category->hasChildren() )
-        {
+        if ($category->hasChildren()) {
 
             $childCategories = $this->getSubcategories($category);
 
-            if ( count($childCategories) > 0 )
-            {
+            if (count($childCategories) > 0) {
 
                 $html .= '<ul class="o-list o-list--unstyled">';
 
                 // Loop through children categories
-                foreach ( $childCategories as $childCategory )
-                {
+                foreach ($childCategories as $childCategory) {
 
                     $html .= '<li class="level' . $level . ($this->isActive($childCategory) ? ' active' : '') . '">';
-                    $html .= '<a href="' . $this->getCategoryUrl($childCategory) . '" title="' . $childCategory->getName() . '" class="' . ($this->isActive($childCategory) ? 'is-active' : '') . '">' . $childCategory->getName() . '</a>';
+                    $html .= '<a href="' . $this->getCategoryUrl($childCategory) . '" title="'
+                        . $childCategory->getName() . '" class="' . ($this->isActive($childCategory) ? 'is-active' : '')
+                        . '">' . $childCategory->getName() . '</a>';
 
-                    if ( $childCategory->hasChildren() )
-                    {
-                        if ( $this->isActive($childCategory) )
-                        {
+                    if ($childCategory->hasChildren()) {
+                        if ($this->isActive($childCategory)) {
                             $html .= '<span class="expanded"><i class="fa fa-minus"></i></span>';
-                        }
-                        else
-                        {
+                        } else {
                             $html .= '<span class="expand"><i class="fa fa-plus"></i></span>';
                         }
                     }
 
-                    if ( $childCategory->hasChildren() )
-                    {
+                    if ($childCategory->hasChildren()) {
                         $html .= $this->getChildCategoryView($childCategory, '', ($level + 1));
                     }
 
@@ -206,41 +200,36 @@ class Sidebar extends Template
     /**
      * Retrieve subcategories
      * DEPRECATED
-	 *
+     *
      * @param $category
      *
      * @return array
      */
-	 
-    public function getSubcategories($category)
+
+    public function getSubcategories(Category $category)
     {
-        if ( $this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() )
-        {
+        if ($this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource()) {
             return (array)$category->getChildrenNodes();
         }
 
         return $category->getChildrenCategories();
     }
-	
 
     /**
      * Get current category
      *
-     * @param \Magento\Catalog\Model\Category $category
+     * @param Category $category
      *
-     * @return Category
      */
-    public function isActive($category)
+    public function isActive(Category $category): bool
     {
         $activeCategory = $this->_coreRegistry->registry('current_category');
         $activeProduct  = $this->_coreRegistry->registry('current_product');
 
-        if ( !$activeCategory )
-        {
+        if (!$activeCategory) {
 
             // Check if we're on a product page
-            if ( $activeProduct !== null )
-            {
+            if ($activeProduct !== null) {
                 return in_array($category->getId(), $activeProduct->getCategoryIds());
             }
 
@@ -248,17 +237,15 @@ class Sidebar extends Template
         }
 
         // Check if this is the active category
-        if ( $this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() AND
+        if ($this->categoryFlatConfig->isFlatEnabled() && $category->getUseFlatResource() and
             $category->getId() == $activeCategory->getId()
-        )
-        {
+        ) {
             return true;
         }
 
         // Check if a subcategory of this category is active
         $childrenIds = $category->getAllChildren(true);
-        if ( !is_null($childrenIds) AND in_array($activeCategory->getId(), $childrenIds) )
-        {
+        if (!is_null($childrenIds) and in_array($activeCategory->getId(), $childrenIds)) {
             return true;
         }
 
