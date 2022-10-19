@@ -105,7 +105,7 @@ class Sidebar extends Template
 
         $categoryDepthLevel = $this->_dataHelper->getCategoryDepthLevel();
 
-        $storeCategories = $category->getCategories($this->getSelectedRootCategory(), (string) $categoryDepthLevel, $sorted,
+        $storeCategories = $category->getCategories($this->getSelectedRootCategory(), (int) $categoryDepthLevel, $sorted,
             $asCollection, $toLoad);
 
         $this->_storeCategories[$cacheKey] = $storeCategories;
@@ -206,7 +206,7 @@ class Sidebar extends Template
      *
      * @param $category
      *
-     * @return Category[] | \Magento\Catalog\Model\ResourceModel\Category\Collection
+     * @return \Magento\Catalog\Model\ResourceModel\Category\Collection|\Magento\Catalog\Model\Category[]
      */
 
     public function getSubcategories(Category $category)
